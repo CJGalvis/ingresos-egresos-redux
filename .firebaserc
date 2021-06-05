@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "ingresos-egresos-ngrx": {
+      "hosting": {
+        "app-ingresos": [
+          "ingresos-egresos-ngrx"
+        ]
+      }
+    }
+  }
+}
