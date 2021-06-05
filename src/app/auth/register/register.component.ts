@@ -5,6 +5,9 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from 'src/app/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -14,7 +17,11 @@ import {
 export class RegisterComponent implements OnInit {
   public registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.buildForm();
@@ -35,8 +42,27 @@ export class RegisterComponent implements OnInit {
   }
 
   createUser() {
-    console.log(this.registerForm);
-    console.log(this.registerForm.valid);
-    console.log(this.registerForm.value);
+    if (this.registerForm.invalid) return;
+    Swal.fire({
+      title: 'Espere por favor...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    const { username, email, password } = this.registerForm.value;
+    this.authService
+      .createUser(username, email, password)
+      .then((credentials) => {
+        Swal.close();
+        this.router.navigate(['/']);
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error.message,
+        });
+      });
   }
 }
