@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/app.reducer';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styles: [
-  ]
+  styles: [],
 })
 export class NavbarComponent implements OnInit {
+  public username: string = 'Camilitoooo';
 
-  constructor() { }
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.store.select('auth').subscribe(({ user }) => {
+      this.username = user?.username;
+    });
   }
-
 }

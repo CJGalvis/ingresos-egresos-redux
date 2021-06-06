@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -6,7 +6,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { AppState } from 'src/app/app.reducer';
 import { AuthService } from 'src/app/services/auth.service';
+import { isLoading, stopLoading } from 'src/app/shared/ui.actions';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -14,17 +18,31 @@ import Swal from 'sweetalert2';
   templateUrl: './register.component.html',
   styles: [],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   public registerForm: FormGroup;
+  public isLoading: boolean = false;
+  private uiSubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
     this.buildForm();
+    this.getUiState();
+  }
+
+  ngOnDestroy() {
+    this.uiSubscription.unsubscribe();
+  }
+
+  getUiState() {
+    this.uiSubscription = this.store
+      .select('ui')
+      .subscribe((ui) => (this.isLoading = ui.isLoading));
   }
 
   buildForm() {
@@ -43,21 +61,16 @@ export class RegisterComponent implements OnInit {
 
   createUser() {
     if (this.registerForm.invalid) return;
-    Swal.fire({
-      title: 'Espere por favor...',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    this.store.dispatch(isLoading());
     const { username, email, password } = this.registerForm.value;
     this.authService
       .createUser(username, email, password)
       .then((credentials) => {
-        Swal.close();
+        this.store.dispatch(stopLoading());
         this.router.navigate(['/']);
       })
       .catch((error) => {
+        this.store.dispatch(stopLoading());
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
