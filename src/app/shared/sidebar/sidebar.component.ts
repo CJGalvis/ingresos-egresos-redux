@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { AppState } from 'src/app/app.reducer';
 import { AuthService } from 'src/app/services/auth.service';
 import Swal from 'sweetalert2';
@@ -10,9 +11,10 @@ import Swal from 'sweetalert2';
   templateUrl: './sidebar.component.html',
   styles: [],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   public username: string = '';
   public email: string = '';
+  private uiSubscription: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -21,10 +23,14 @@ export class SidebarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.store.select('auth').subscribe(({ user }) => {
+    this.uiSubscription = this.store.select('auth').subscribe(({ user }) => {
       this.username = user?.username;
       this.email = user?.email;
     });
+  }
+
+  ngOnDestroy() {
+    this.uiSubscription.unsubscribe();
   }
 
   logout() {

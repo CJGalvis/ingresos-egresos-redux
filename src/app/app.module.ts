@@ -15,6 +15,9 @@ import { StoreModule } from '@ngrx/store';
 import { appReducers } from './app.reducer';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
+// charts
+import { ChartsModule } from 'ng2-charts';
+
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
@@ -47,6 +50,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    ChartsModule,
     StoreModule.forRoot(appReducers),
     StoreDevtoolsModule.instrument({
       maxAge: 25, // Retains last 25 states
