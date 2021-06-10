@@ -30,7 +30,7 @@ export class AuthService {
             this.store.dispatch(setUser({ user: tempUser }));
           });
       } else {
-        this.userSubscription.unsubscribe();
+        this.userSubscription?.unsubscribe();
         this.store.dispatch(unSetUser());
       }
     });
